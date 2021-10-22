@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { GoogleMap, LoadScript , MarkerClusterer, Marker} from '@react-google-maps/api';
-import { SearchContext } from '../App';
 import PropTypes from 'prop-types'
 
 const containerStyle = {
@@ -47,21 +47,16 @@ function createKey(location) {
 
 function Map({center}) {
   const [locations, setLocations] = useState(initLocations);
-  const [currentLocation, setCurrentLocation] = useState({
-    lat: -28.024,
-    lng: 140.887
-  })
-  const {search} = useContext(
-    SearchContext
-  );
-  console.log(currentLocation,center);
+  const [currentLocation, setCurrentLocation] = useState(center);
+  const map = useSelector((state) => state.map)
+  
   useEffect(() => {
     const filteredLocation = initLocations.filter((location) => {
-      return location.name.includes(search.name) &&
-      search.labels.some((label) => location.label === label)
+      return location.name.includes(map.name) &&
+      map.labels.some((label) => location.label === label)
     });
     setLocations(filteredLocation)
-  }, [search])
+  }, [map])
 
   useEffect(() => {
     setCurrentLocation(center);

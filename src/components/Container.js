@@ -41,7 +41,6 @@ function Container() {
       error => console.log(error)
     }
   }
-  console.log(center);
   return (
     <div>
       <div className="header">

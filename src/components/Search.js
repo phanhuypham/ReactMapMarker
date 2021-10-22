@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
+import { filterMarkers } from './mapSlice'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
-import { SearchContext } from '../App'
 
 const SearchItem = styled.div`
   padding: 15px 0;
@@ -32,35 +33,33 @@ const Button = styled.button`
 const SearchSubmit = styled(Button)`
   width: 200px;
 `
-function Search(props) {
-  const {search, setSearch} = useContext(
-    SearchContext
-  );
+function Search({showCurrentLocation}) {
+  const map = useSelector((state) => state.map)
+  const dispatch = useDispatch()
 
-  const [name, setName] = useState(search.name);
-  const [labels, setLabels] = useState(search.labels);
-
-
+  const [name, setName] = useState(map.name);
+  const [labels, setLabels] = useState(map.labels)
   const submit = (e) => {
     e.preventDefault();
     const submitedName = name.trim().toLowerCase();
-    setSearch({name: submitedName, labels});
+    dispatch(filterMarkers({name: submitedName, labels}));
   }
 
   const handleChangeLabel = (label) => {
     const labelIndex = labels.indexOf(label);
     if (labelIndex > -1) {
-      const newLabels = labels
+      const newLabels = [...labels]
       newLabels.splice(labelIndex, 1);
       setLabels(newLabels);
     } else {
-      setLabels([...labels, label]);
+      setLabels([...labels, label])
     }
   }
+
   return (
     <div>
       <SearchItem>
-        <Button onClick={props.showCurrentLocation}>
+        <Button onClick={showCurrentLocation}>
           <FontAwesomeIcon icon={faMapMarkerAlt} />          
           <span> Search from your location</span>
         </Button>

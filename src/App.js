@@ -1,18 +1,15 @@
 import './App.css';
-import React, { useState } from 'react';
+import React from 'react';
 import Container from './components/Container';
 
-export const SearchContext = React.createContext(null);
+import { store } from './store'
+import { Provider } from 'react-redux'
 
 function App() {
-  const [search, setSearch] = useState({
-    labels: ['repair', 'showroom', 'service'],
-    name: '',
-  });
   return (
-    <SearchContext.Provider value={{search, setSearch}}>
+    <Provider store={store}>
       <Container />
-    </SearchContext.Provider>
+    </Provider>
   );
 }
 
