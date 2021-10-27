@@ -1,66 +1,56 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 // import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import carPicture from '../../assets/car.jpeg'
-import { useSelector, useDispatch } from 'react-redux'
-import { selectPreviousTab } from './saleSlice'
 
 
-import { Button, Card, CardContent, CardMedia, Grid, Tab } from '@mui/material';
-import { TabContext,TabList,TabPanel } from '@mui/lab';
+import {  Card, CardContent, Grid } from '@mui/material';
+import { TabContext} from '@mui/lab';
 import { Box } from '@mui/system';
-import TabContent from './TabContent';
 import db from '../../db.json'
+import SaleImage from './SaleImage'
+import SaleTabList from './SaleTabList';
+import SaleTabPanelList from './SaleTabPanelList';
+import SaleSubmit from './SaleSubmit';
 const StyledGridContainer = styled(Grid) `
   margin-top: 20px;
   height: auto:
 `
-const CardImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 200px;
-`
 
-const SelectedOptions = styled.ul`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding-left: 10px;
-  color: white;
-`
+
 const CarSale = () => {
-  const sale = useSelector((state) => state.sale)
-  const dispatch = useDispatch();
-  const [tab, setTab] = useState('1')
-
   const dbOptions = useMemo(() => db.options, [])
-  
-  const handleChange = (event, newTab) => {
+  const tabNameList = useMemo(() => db.options.map((option) => option.optionType));
+  const [tab, setTab] = useState(0)
+  const [selectedOptions, setSelectedOptions] = useState(Array(dbOptions.length).fill(null))
+  const [isSubmitActive, setIsSubmitActive] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0)
+
+  useEffect(()=> {
+    setIsSubmitActive(selectedOptions.every((option) => option))
+  },[JSON.stringify(selectedOptions)])
+
+  const onTabChange = (event, newTab) => {
     setTab(newTab);
   };
-  const renderTabs = () => {
-    return dbOptions.map((option, index) => {
-      return <Tab label={option.optionType} value={index} key={index}
-        disabled={index !== 0 && !sale.options[index-1]} 
-        onClick={() => dispatch(selectPreviousTab(index))}
-      />
-    })
+  
+  const checkOptionTypePos = (arr, optionType) => {
+    return arr.findIndex(element => {
+      return element.optionType === optionType
+    });
   }
-  const renderTabPanels = useCallback(() => {
-    return dbOptions.map((option, index) => {
-      const renderingOptionData = index === 0 ? option.data : option.data.filter((item) => (
-        sale.options[index - 1] && sale.options[index - 1].nextOptId.includes(item.id) 
-      ))
-      return (<TabPanel value={index} key={index}>
-        <TabContent optionData={renderingOptionData} optionType={option.optionType} optionPos={index}/>
-      </TabPanel>)}
-    )
-  },[sale.options]);
 
-  const renderSelectedOptions = () => {
-    return dbOptions.map((option, index) => {
-      return sale.options[index] && <li key={index}>{option.optionType}: {sale.options[index].name}</li>
-    })
+  const onSelectOption = (option, optionType) => {
+    const optionTypePos = checkOptionTypePos(dbOptions, optionType)
+    const newOptions = selectedOptions;
+    for(let i= optionTypePos + 1;i<newOptions.length;i++) {
+      newOptions[i] = null
+    }
+    if(optionTypePos >= 0) {
+      newOptions[optionTypePos] = {...option, optionType};
+    }
+    setSelectedOptions(newOptions);
+    setTotalPrice(selectedOptions.reduce((prev, curr) => {
+      return curr ? prev + curr.price : prev} , 0))
   }
   return (
     <div>
@@ -70,30 +60,21 @@ const CarSale = () => {
         direction="column"
         alignItems="center"
       >
-
         <Card sx={{ maxWidth: 500}}>
-          <CardImageContainer>
-            <CardMedia
-              component="img"
-              height="200"
-              image={carPicture}
-            />
-            <SelectedOptions>
-              {renderSelectedOptions()}
-              <li>Price: {sale.price}$</li>
-            </SelectedOptions>
-          </CardImageContainer>
+          <SaleImage selectedOptions={selectedOptions} totalPrice={totalPrice}/>
           <CardContent>
             <Box sx={{ width: '100%', typography: 'body1' }}>
               <TabContext value={tab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleChange} aria-label="change tab">
-                    {renderTabs()}
-                  </TabList>
-                </Box>
-                {renderTabPanels()}
+                <SaleTabList 
+                  onTabChange={onTabChange} 
+                  tabNameList={tabNameList} 
+                  selectedOptions={selectedOptions}/>
+                <SaleTabPanelList 
+                  onSelectOption={onSelectOption} 
+                  optionList={dbOptions} 
+                  selectedOptions={selectedOptions}/>
               </TabContext>
-              <Button disabled={sale.options.length !== dbOptions.length} variant="contained" color="success">Submit</Button>
+              <SaleSubmit isSubmitActive={isSubmitActive}/>
             </Box>
           </CardContent>
         </Card>

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Button } from '@mui/material'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectOption } from './saleSlice'
+
 
 const StyledButton = styled(Button) `
   margin: 20px;
@@ -16,24 +15,26 @@ const OptionsContainer = styled.div`
   flex-wrap: wrap;
 `
 
-const TabContent = ({optionData, optionType, optionPos}) => {
-  const dispatch = useDispatch()
-  const currentOption = useSelector((state) => state.sale.options[optionPos])
-  const [selectedId, setSelectedId] = useState(!currentOption ? 0 : currentOption.id);
+const TabContent = ({optionData, optionType, onSelectOption, selectedOptionId}) => {
+  const [currentSelectedId, setCurrentSelectedId] = useState(0);
 
-  const onSelectOption = (option) => {
-    if(option.id !== selectedId) {
-      dispatch(selectOption({option, optionType}));
-      setSelectedId(option.id);
+  const _onSelectOption = (option) => {
+    if(option.id !== currentSelectedId) {
+      onSelectOption(option, optionType)
+      setCurrentSelectedId(option.id);
     }
   }
+  useEffect(() => {
+    setCurrentSelectedId(selectedOptionId);
+  },[selectedOptionId])
+
   const renderOptions = () => {
     return optionData.map((option) => {
       return (
         <StyledButton 
           key={option.id} 
-          variant={option.id === selectedId ? "contained": "outlined"}
-          onClick={() => onSelectOption(option)}>
+          variant={option.id === currentSelectedId ? "contained": "outlined"}
+          onClick={() => _onSelectOption(option)}>
           {option.name}
           <div>{option.price}$</div>
         </StyledButton>
@@ -50,7 +51,9 @@ const TabContent = ({optionData, optionType, optionPos}) => {
 TabContent.propTypes = {
   optionData: PropTypes.array,
   optionType: PropTypes.string,
-  optionPos: PropTypes.number
+  optionPos: PropTypes.number,
+  onSelectOption: PropTypes.func,
+  selectedOptionId: PropTypes.string
 }
 
 export default TabContent

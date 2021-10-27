@@ -18,7 +18,6 @@ export const saleSlice = createSlice({
     selectOption: (state, action) => {
       const {option, optionType} = action.payload
       const duplicateIndex = checkDuplicatedOptionType(state.options, optionType)
-      console.log(duplicateIndex);
       if(duplicateIndex >= 0) {
         const newOptions = state.options;
         newOptions[duplicateIndex] = {...option, optionType};
@@ -27,7 +26,6 @@ export const saleSlice = createSlice({
       else {
         state.options.push({...option, optionType})
       }
-
       state.price = state.options.reduce((prev, curr) => {
         return prev + curr.price} , 0);
     },
@@ -37,7 +35,6 @@ export const saleSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { selectOption, selectPreviousTab } = saleSlice.actions
 
 export default saleSlice.reducer
