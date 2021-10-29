@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { TabPanel } from '@mui/lab'
 import TabContent from './TabContent'
+import { DBOption, Option, OptionInfo } from '../../interfaces'
 
-const SaleTabPanelList = props => {
+interface SaleTabPanelListType {
+  optionList: DBOption[],
+  onSelectOption: (option: OptionInfo, optionType: string) => void,
+  selectedOptions: Option[]
+}
+
+const SaleTabPanelList: React.FC<SaleTabPanelListType> = (props) => {
   const [selectedOptionList, setSelectedOptionList] = useState(props.selectedOptions)
   useEffect(() => {
     setSelectedOptionList(props.selectedOptions)
-  }, [JSON.stringify(props.selectedOptions)])
+  }, [props.selectedOptions])
 
   const renderTabPanels = () => {
     const {optionList, onSelectOption} = props
@@ -15,7 +21,7 @@ const SaleTabPanelList = props => {
       const renderingOptionData =  index === 0 ? option.data : option.data.filter((item) => (
         selectedOptionList[index - 1] && selectedOptionList[index - 1].nextOptId.includes(item.id) 
       ))
-      return (<TabPanel value={index} key={index}>
+      return (<TabPanel value={index.toString()} key={index}>
         <TabContent 
           optionData={renderingOptionData} 
           optionType={option.optionType} 
@@ -30,12 +36,6 @@ const SaleTabPanelList = props => {
       {renderTabPanels()}
     </div>
   )
-}
-
-SaleTabPanelList.propTypes = {
-  optionList: PropTypes.array,
-  onSelectOption: PropTypes.func,
-  selectedOptions: PropTypes.array
 }
 
 export default SaleTabPanelList

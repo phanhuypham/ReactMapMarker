@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { GoogleMap, LoadScript , MarkerClusterer, Marker} from '@react-google-maps/api';
-import PropTypes from 'prop-types'
+import { Location } from '../../interfaces';
+import { RootState } from '../../store';
 
 const containerStyle = {
   width: '100%',
@@ -41,19 +42,23 @@ const initLocations = [
 //     'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m5.png',
 // }
 
-function createKey(location) {
+function createKey(location: Location) {
   return location.lat + location.lng
 }
 
-function Map({center}) {
+interface MapType {
+  center: Location
+}
+
+const Map: React.FC<MapType> = ({center}) => {
   const [locations, setLocations] = useState(initLocations);
   const [currentLocation, setCurrentLocation] = useState(center);
-  const map = useSelector((state) => state.map)
+  const map = useSelector((state: RootState) => state.map)
   
   useEffect(() => {
     const filteredLocation = initLocations.filter((location) => {
       return location.name.includes(map.name) &&
-      map.labels.some((label) => location.label === label)
+      map.labels.some((label: string) => location.label === label)
     });
     setLocations(filteredLocation)
   }, [map])
@@ -85,9 +90,5 @@ function Map({center}) {
     </LoadScript>
   )
 }
-
-Map.propTypes = {
-  center: PropTypes.object,
-};
 
 export default Map

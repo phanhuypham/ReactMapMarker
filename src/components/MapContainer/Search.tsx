@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { filterMarkers } from './mapSlice'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
+import { RootState } from '../../store'
 
 const SearchItem = styled.div`
   padding: 15px 0;
@@ -33,19 +33,24 @@ const Button = styled.button`
 const SearchSubmit = styled(Button)`
   width: 200px;
 `
-function Search({showCurrentLocation}) {
-  const map = useSelector((state) => state.map)
+
+interface SearchType {
+  showCurrentLocation: () => void;
+}
+
+const Search: React.FC<SearchType> = ({showCurrentLocation}) => {
+  const map = useSelector((state: RootState) => state.map)
   const dispatch = useDispatch()
 
   const [name, setName] = useState(map.name);
   const [labels, setLabels] = useState(map.labels)
-  const submit = (e) => {
+  const submit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     const submitedName = name.trim().toLowerCase();
     dispatch(filterMarkers({name: submitedName, labels}));
   }
 
-  const handleChangeLabel = (label) => {
+  const handleChangeLabel = (label: string) => {
     const labelIndex = labels.indexOf(label);
     if (labelIndex > -1) {
       const newLabels = [...labels]
@@ -97,9 +102,6 @@ function Search({showCurrentLocation}) {
       </form>
     </div>
   )
-}
-Search.propTypes = {
-  showCurrentLocation: PropTypes.func
 }
 
 export default Search
