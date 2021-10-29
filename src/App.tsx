@@ -20,7 +20,7 @@ const StyledLink = styled(Link)`
   color: black;
 `
 
-function App() {
+const App: React.FC = () => {
   return (
     <Provider store={store}>
       <Router>

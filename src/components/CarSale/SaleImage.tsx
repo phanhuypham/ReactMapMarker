@@ -1,8 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import carPicture from '../../assets/car.jpeg'
 import { CardMedia } from '@mui/material'
+import { Option } from '../../interfaces'
 
 const CardImageContainer = styled.div`
   position: relative;
@@ -18,7 +18,12 @@ const SelectedOptions = styled.ul`
   color: white;
 `
 
-const SaleImage = ({totalPrice, selectedOptions}) => {
+interface SaleImageProps {
+  totalPrice: number, 
+  selectedOptions: Option[]
+}
+
+const SaleImage: React.FC<SaleImageProps> = ({totalPrice, selectedOptions}) => {
   const renderSelectedOptions = () => {
     return selectedOptions.map((option, index) => {
       return option && <li key={index}>{option.optionType}: {option.name}</li>
@@ -40,11 +45,6 @@ const SaleImage = ({totalPrice, selectedOptions}) => {
       </CardImageContainer>
     </div>
   )
-}
-
-SaleImage.propTypes = {
-  selectedOptions: PropTypes.array,
-  totalPrice: PropTypes.number
 }
 
 export default SaleImage

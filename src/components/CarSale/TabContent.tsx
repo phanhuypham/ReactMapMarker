@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { Button } from '@mui/material'
 import styled from 'styled-components'
+import { OptionInfo } from '../../interfaces'
 
 
 const StyledButton = styled(Button) `
@@ -15,10 +15,17 @@ const OptionsContainer = styled.div`
   flex-wrap: wrap;
 `
 
-const TabContent = ({optionData, optionType, onSelectOption, selectedOptionId}) => {
-  const [currentSelectedId, setCurrentSelectedId] = useState(0);
+interface TabContentType {
+  optionData: OptionInfo[], 
+  optionType: string, 
+  onSelectOption: (option: OptionInfo, optionType: string) => void, 
+  selectedOptionId: string;
+}
 
-  const _onSelectOption = (option) => {
+const TabContent: React.FC<TabContentType> = ({optionData, optionType, onSelectOption, selectedOptionId}) => {
+  const [currentSelectedId, setCurrentSelectedId] = useState('');
+
+  const _onSelectOption = (option: OptionInfo) => {
     if(option.id !== currentSelectedId) {
       onSelectOption(option, optionType)
       setCurrentSelectedId(option.id);
@@ -27,7 +34,7 @@ const TabContent = ({optionData, optionType, onSelectOption, selectedOptionId}) 
   useEffect(() => {
     setCurrentSelectedId(selectedOptionId);
   },[selectedOptionId])
-
+  
   const renderOptions = () => {
     return optionData.map((option) => {
       return (
@@ -46,14 +53,6 @@ const TabContent = ({optionData, optionType, onSelectOption, selectedOptionId}) 
       {renderOptions()}
     </OptionsContainer>
   )
-}
-
-TabContent.propTypes = {
-  optionData: PropTypes.array,
-  optionType: PropTypes.string,
-  optionPos: PropTypes.number,
-  onSelectOption: PropTypes.func,
-  selectedOptionId: PropTypes.string
 }
 
 export default TabContent

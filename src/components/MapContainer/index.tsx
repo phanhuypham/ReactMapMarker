@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { Location } from '../../interfaces'
 import Map from './Map'
 import Search from './Search'
 
@@ -19,13 +20,15 @@ const Wrapper = styled.div`
   height: 400px;
 `
 
-const initCenter = {
+const initCenter: Location = {
   lat: -28.024,
-  lng: 140.887
+  lng: 140.887,
+  label : 'center',
+  name: 'center' 
 };
 
-function Container() {
-  const [center, setCenter] = useState(initCenter)
+const Container: React.FC = () => {
+  const [center, setCenter] = useState<Location>(initCenter)
 
   const showCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -33,13 +36,13 @@ function Container() {
         position => {
           setCenter({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
+            label : 'center',
+            name: 'center' 
           })       
         }
       )
-    } else {
-      error => console.log(error)
-    }
+    } 
   }
   return (
     <div>

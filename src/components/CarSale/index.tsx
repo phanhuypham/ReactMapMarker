@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 // import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { DBOption, OptionInfo } from '../../interfaces';
 
 
 import {  Card, CardContent, Grid } from '@mui/material';
@@ -17,41 +18,44 @@ const StyledGridContainer = styled(Grid) `
 `
 
 
-const CarSale = () => {
-  const dbOptions = useMemo(() => db.options, [])
-  const tabNameList = useMemo(() => db.options.map((option) => option.optionType));
-  const [tab, setTab] = useState(0)
+const CarSale: React.FC = () => {
+  const dbOptions = useMemo<DBOption[]>(() => db.options, [])
+  const tabNameList = useMemo(() => db.options.map((option) => option.optionType),[]);
+  const [tab, setTab] = useState('0')
   const [selectedOptions, setSelectedOptions] = useState(Array(dbOptions.length).fill(null))
   const [isSubmitActive, setIsSubmitActive] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0)
 
   useEffect(()=> {
     setIsSubmitActive(selectedOptions.every((option) => option))
-  },[JSON.stringify(selectedOptions)])
+    setTotalPrice(selectedOptions.reduce((prev, curr) => {      
+      return curr ? prev + curr.price : prev} , 0))
+  },[selectedOptions])
 
-  const onTabChange = (event, newTab) => {
+  const onTabChange = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
     setTab(newTab);
   };
   
-  const checkOptionTypePos = (arr, optionType) => {
+  const checkOptionTypePos = (arr: DBOption[], optionType: string) => {
     return arr.findIndex(element => {
       return element.optionType === optionType
     });
   }
 
-  const onSelectOption = (option, optionType) => {
+  const onSelectOption = (option: OptionInfo, optionType: string) => {
     const optionTypePos = checkOptionTypePos(dbOptions, optionType)
-    const newOptions = selectedOptions;
-    for(let i= optionTypePos + 1;i<newOptions.length;i++) {
-      newOptions[i] = null
+    const newOptions = [...selectedOptions];
+    for(let optionIdx= optionTypePos + 1; optionIdx<newOptions.length; optionIdx++) {
+      newOptions[optionIdx] = null
     }
+  
     if(optionTypePos >= 0) {
       newOptions[optionTypePos] = {...option, optionType};
     }
-    setSelectedOptions(newOptions);
-    setTotalPrice(selectedOptions.reduce((prev, curr) => {
-      return curr ? prev + curr.price : prev} , 0))
+    setSelectedOptions(newOptions);    
+   
   }
+
   return (
     <div>
       <StyledGridContainer
@@ -82,9 +86,5 @@ const CarSale = () => {
     </div>
   )
 }
-
-// CarSale.propTypes = {
-
-// }
 
 export default CarSale

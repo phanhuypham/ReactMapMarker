@@ -1,16 +1,21 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Box } from '@mui/system'
 import { TabList } from '@mui/lab';
 import { Tab } from '@mui/material';
+import { Option } from '../../interfaces';
 
-const SaleTabList = props => {
+interface SaleTabListType {
+  onTabChange: ((event: React.SyntheticEvent<Element, Event>, value: string) => void),
+  tabNameList: string[],
+  selectedOptions: Option[]
+}
 
+const SaleTabList: React.FC<SaleTabListType> = (props) => {
   const renderTabs = () => {
     const {tabNameList, selectedOptions} = props
     return tabNameList.map((tab, index) => {
-      return <Tab label={tab} value={index} key={index}
-        disabled={index !== 0 && !selectedOptions[index-1]} 
+      return <Tab label={tab} value={index.toString()} key={index}
+        disabled={index !== 0 && selectedOptions[index-1] === null}
       />
     })
   }
@@ -22,13 +27,6 @@ const SaleTabList = props => {
       </TabList>
     </Box>
   )
-}
-
-SaleTabList.propTypes = {
-  onTabChange: PropTypes.func,
-  tabNameList: PropTypes.array,
-  activeIndex: PropTypes.number,
-  selectedOptions: PropTypes.array
 }
 
 export default SaleTabList
